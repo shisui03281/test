@@ -8,14 +8,6 @@ module.exports = {
   rebuildConfig: {},
   makers: [
     {
-      name: '@electron-forge/maker-squirrel',
-      config: {
-        // 基本的なSquirrel.Windows設定
-        setupExe: 'MyAppSetup.exe',
-        noMsi: true,
-      },
-    },
-    {
       name: '@electron-forge/maker-zip',
       platforms: ['win32', 'darwin'],
     },
