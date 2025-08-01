@@ -1,12 +1,7 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('node:path');
-
-// 自動更新のロジックを追加
-try {
-  require('update-electron-app')();
-} catch (error) {
-  console.log('自動更新の初期化に失敗しました:', error.message);
-}
+// 'electron-updater'からautoUpdaterをインポート
+const { autoUpdater } = require('electron-updater');
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
@@ -53,6 +48,9 @@ app.whenReady().then(() => {
 
   createWindow();
 
+  // アプリ起動時に一度だけ、更新がないかチェック
+  autoUpdater.checkForUpdatesAndNotify();
+
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   app.on('activate', () => {
@@ -60,6 +58,11 @@ app.whenReady().then(() => {
       createWindow();
     }
   });
+});
+
+// 手動更新チェック用のIPCハンドラ
+ipcMain.on('check-for-updates', () => {
+  autoUpdater.checkForUpdatesAndNotify();
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common

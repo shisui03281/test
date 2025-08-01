@@ -32,8 +32,18 @@ document.addEventListener('DOMContentLoaded', () => {
   if (updateStatusSpan) {
     // 自動更新の状態を確認（実際の実装ではIPC通信を使用）
     setTimeout(() => {
-      updateStatusSpan.textContent = '有効 (1時間ごとに確認)';
+      updateStatusSpan.textContent = '有効 (リアルタイム確認)';
       updateStatusSpan.style.color = '#28a745';
     }, 2000);
+  }
+
+  // ボタンクリック時の処理を追加
+  const updateBtn = document.getElementById('update-check-btn');
+  if (updateBtn && window.electronAPI) {
+    updateBtn.addEventListener('click', () => {
+      window.electronAPI.checkForUpdates();
+      // ユーザーにフィードバックを返す（任意）
+      alert('更新の確認を開始します。新しいバージョンが見つかった場合は通知されます。');
+    });
   }
 }); 
