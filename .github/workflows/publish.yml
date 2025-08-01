@@ -1,6 +1,5 @@
 name: 'Publish Electron App'
 
-# このワークフローが実行されるタイミングを定義
 on:
   push:
     tags:
@@ -8,32 +7,34 @@ on:
 
 jobs:
   publish-app:
-    # Windows, macOS, Linuxの各OSでジョブを実行
     strategy:
       matrix:
         os: [windows-latest, macos-latest, ubuntu-latest]
 
-    runs-on: ${{ matrix.os }} # ジョブの実行環境をマトリックスから指定
+    runs-on: ${{ matrix.os }}
 
     steps:
-      # 1. リポジトリのコードをチェックアウト
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # 2. Node.js環境をセットアップ
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18' # package.jsonのenginesに合わせて調整してください
+          node-version: '18'
           cache: 'npm'
 
-      # 3. 依存関係をインストール
+      # このステップを新たに追加
+      - name: Install build dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y fakeroot dpkg rpm
+
       - name: Install dependencies
         run: npm ci
 
-      # 4. アプリケーションをビルドして公開
       - name: Publish application
         run: npm run publish
         env:
-          # GitHubリポジトリのSecretsに設定したトークンを使用
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+          # リポジトリのSecretsに設定したトークンを使用
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
