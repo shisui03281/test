@@ -8,12 +8,6 @@ module.exports = {
   rebuildConfig: {},
   makers: [
     {
-      name: '@electron-forge/maker-squirrel',
-      config: {
-        noMsi: true,
-      },
-    },
-    {
       name: '@electron-forge/maker-zip',
       platforms: ['win32', 'darwin'],
     },
@@ -42,5 +36,19 @@ module.exports = {
       [FuseV1Options.EnableEmbeddedAsarIntegrityValidation]: true,
       [FuseV1Options.OnlyLoadAppFromAsar]: true,
     }),
+  ],
+  // publishersのセクションを新たに追加
+  publishers: [
+    {
+      name: '@electron-forge/publisher-github',
+      config: {
+        repository: {
+          owner: 'shisui03281', // あなたのGitHubユーザー名
+          name: 'test'         // あなたのGitHubリポジトリ名
+        },
+        prerelease: false,
+        draft: false
+      }
+    }
   ],
 };

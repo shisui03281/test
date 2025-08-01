@@ -1,0 +1,39 @@
+name: 'Publish Electron App'
+
+# このワークフローが実行されるタイミングを定義
+on:
+  push:
+    tags:
+      - 'v*.*.*' # vで始まるタグ（例: v1.0.2）がPushされたときに実行
+
+jobs:
+  publish-app:
+    # Windows, macOS, Linuxの各OSでジョブを実行
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+
+    runs-on: ${{ matrix.os }} # ジョブの実行環境をマトリックスから指定
+
+    steps:
+      # 1. リポジトリのコードをチェックアウト
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 2. Node.js環境をセットアップ
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18' # package.jsonのenginesに合わせて調整してください
+          cache: 'npm'
+
+      # 3. 依存関係をインストール
+      - name: Install dependencies
+        run: npm ci
+
+      # 4. アプリケーションをビルドして公開
+      - name: Publish application
+        run: npm run publish
+        env:
+          # GitHubリポジトリのSecretsに設定したトークンを使用
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 

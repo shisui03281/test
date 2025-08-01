@@ -1,7 +1,7 @@
 {
   "name": "my-app",
   "productName": "MyApp",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "My Electron application description",
   "main": "src/index.js",
   "scripts": {
@@ -18,8 +18,14 @@
     "email": "159166608+shisui03281@users.noreply.github.com"
   },
   "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
   "dependencies": {
-    "electron-squirrel-startup": "^1.0.1"
+    "electron-log": "^5.4.2",
+    "electron-squirrel-startup": "^1.0.1",
+    "update-electron-app": "^3.1.1"
   },
   "devDependencies": {
     "@electron-forge/cli": "^7.8.2",
@@ -29,6 +35,7 @@
     "@electron-forge/maker-zip": "^7.8.2",
     "@electron-forge/plugin-auto-unpack-natives": "^7.8.2",
     "@electron-forge/plugin-fuses": "^7.8.2",
+    "@electron-forge/publisher-github": "^7.8.2",
     "@electron/fuses": "^1.8.0",
     "electron": "^28.0.0",
     "electron-builder": "^26.0.12"
@@ -47,7 +54,9 @@
       "target": [
         {
           "target": "nsis",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         }
       ],
       "icon": null

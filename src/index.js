@@ -1,6 +1,13 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('node:path');
 
+// 自動更新のロジックを追加
+try {
+  require('update-electron-app')();
+} catch (error) {
+  console.log('自動更新の初期化に失敗しました:', error.message);
+}
+
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
   app.quit();
