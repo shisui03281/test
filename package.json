@@ -1,7 +1,7 @@
 {
   "name": "my-app",
   "productName": "MyApp",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "My Electron application description",
   "main": "src/index.js",
   "scripts": {
@@ -66,6 +66,11 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "shisui03281",
+      "repo": "test"
     }
   }
 }
