@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog } = require('electron'); // dialog を追加
 const path = require('node:path');
 // 'electron-updater'からautoUpdaterをインポート
 const { autoUpdater } = require('electron-updater');
@@ -15,9 +15,18 @@ if (require('electron-squirrel-startup')) {
 // アプリケーションのバージョンを取得
 const appVersion = app.getVersion();
 
-const createWindow = () => {
+let mainWindow; // mainWindowをグローバルスコープで定義
+
+// 画面に更新ステータスを送信する関数
+function sendStatusToWindow(text) {
+  if (mainWindow) {
+    mainWindow.webContents.send('update-status', text);
+  }
+}
+
+function createWindow() {
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
     webPreferences: {
@@ -52,8 +61,41 @@ app.whenReady().then(() => {
 
   createWindow();
 
-  // アプリ起動時に一度だけ、更新がないかチェック
-  console.log('更新チェックを開始します...');
+  // --- autoUpdaterのイベントリスナーをここに追加 ---
+  autoUpdater.on('checking-for-update', () => {
+    sendStatusToWindow('更新を確認しています...');
+  });
+  autoUpdater.on('update-available', (info) => {
+    sendStatusToWindow(`新しいバージョン ${info.version} が見つかりました。ダウンロードを開始します。`);
+  });
+  autoUpdater.on('update-not-available', (info) => {
+    sendStatusToWindow('現在、利用可能な新しいバージョンはありません。');
+  });
+  autoUpdater.on('error', (err) => {
+    sendStatusToWindow(`エラーが発生しました: ${err.message}`);
+  });
+  autoUpdater.on('download-progress', (progressObj) => {
+    let log_message = `ダウンロード速度: ${Math.round(progressObj.bytesPerSecond / 1024)} KB/s`;
+    log_message = log_message + ` - ダウンロード済み ${Math.round(progressObj.percent)}%`;
+    sendStatusToWindow(log_message);
+  });
+  autoUpdater.on('update-downloaded', (info) => {
+    sendStatusToWindow('アップデートのダウンロードが完了しました。再起動してインストールします。');
+    // ダイアログを表示してユーザーに再起動を促す
+    dialog.showMessageBox({
+      type: 'info',
+      title: 'アップデートの準備完了',
+      message: '新しいバージョンをインストールする準備ができました。アプリケーションを再起動しますか？',
+      buttons: ['再起動', '後で']
+    }).then(buttonIndex => {
+      if (buttonIndex.response === 0) {
+        autoUpdater.quitAndInstall();
+      }
+    });
+  });
+  // --- ここまで ---
+
+  // 起動時に更新をチェック
   autoUpdater.checkForUpdatesAndNotify();
 
   // On OS X it's common to re-create a window in the app when the
@@ -65,35 +107,9 @@ app.whenReady().then(() => {
   });
 });
 
-// 手動更新チェック用のIPCハンドラ
+// 手動更新チェック用のIPCハンドラも更新をチェックするように変更
 ipcMain.on('check-for-updates', () => {
-  console.log('手動更新チェックを開始します...');
-  autoUpdater.checkForUpdatesAndNotify();
-});
-
-// electron-updaterのイベントハンドラー
-autoUpdater.on('checking-for-update', () => {
-  console.log('更新をチェック中...');
-});
-
-autoUpdater.on('update-available', (info) => {
-  console.log('更新が利用可能です:', info);
-});
-
-autoUpdater.on('update-not-available', (info) => {
-  console.log('更新は利用できません:', info);
-});
-
-autoUpdater.on('error', (err) => {
-  console.log('更新エラー:', err);
-});
-
-autoUpdater.on('download-progress', (progressObj) => {
-  console.log('ダウンロード進捗:', progressObj);
-});
-
-autoUpdater.on('update-downloaded', (info) => {
-  console.log('更新がダウンロードされました:', info);
+  autoUpdater.checkForUpdates(); // .checkForUpdatesAndNotify()から変更
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common

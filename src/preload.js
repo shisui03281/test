@@ -6,8 +6,8 @@ const { contextBridge, ipcRenderer } = require('electron');
 // Expose protected methods that allow the renderer process to use
 // the ipcRenderer without exposing the entire object
 contextBridge.exposeInMainWorld('electronAPI', {
-  // 既存のgetAppVersionはそのまま
   getAppVersion: () => ipcRenderer.invoke('get-app-version'),
-  // 手動更新チェック用の関数を追加
-  checkForUpdates: () => ipcRenderer.send('check-for-updates')
+  checkForUpdates: () => ipcRenderer.send('check-for-updates'),
+  // メインプロセスからの通知を受け取るリスナーを追加
+  onUpdateStatus: (callback) => ipcRenderer.on('update-status', (_event, value) => callback(value))
 });
