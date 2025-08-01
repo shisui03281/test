@@ -7,8 +7,11 @@ on:
 
 jobs:
   publish-windows:
-    # 実行環境をWindowsに固定
     runs-on: windows-latest
+
+    # This block grants the necessary permissions to the job
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout repository
