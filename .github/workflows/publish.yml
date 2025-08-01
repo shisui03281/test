@@ -33,8 +33,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Publish application
-        run: npm run publish
+      # This step now uses `npm run build` and sets GH_TOKEN
+      - name: Build and publish application
+        run: npm run build
         env:
-          # リポジトリのSecretsに設定したトークンを使用
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Use GH_TOKEN for electron-builder
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
