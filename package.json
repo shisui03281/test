@@ -1,7 +1,7 @@
 {
   "name": "my-app",
   "productName": "MyApp",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "My Electron application description",
   "main": "src/index.js",
   "scripts": {
