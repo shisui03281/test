@@ -1,9 +1,9 @@
-name: 'Publish Electron App'
+name: 'Publish Electron App with Electron-Builder'
 
 on:
   push:
     tags:
-      - 'v*.*.*' # vで始まるタグ（例: v1.0.2）がPushされたときに実行
+      - 'v*.*.*'
 
 jobs:
   publish-app:
@@ -17,14 +17,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      # Node.jsのバージョンを20に更新
+      - name: Setup Node.js v20
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20' # 警告解消のためバージョンを20に指定
           cache: 'npm'
 
-      # このステップを新たに追加
-      - name: Install build dependencies
+      - name: Install build dependencies (Linux)
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
@@ -33,9 +33,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # This step now uses `npm run build` and sets GH_TOKEN
-      - name: Build and publish application
+      # "npm run build" を実行し、GH_TOKENを渡す
+      - name: Build and Publish application
         run: npm run build
         env:
-          # Use GH_TOKEN for electron-builder
+          # electron-builderには GH_TOKEN が必要
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
