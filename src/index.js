@@ -3,6 +3,10 @@ const path = require('node:path');
 // 'electron-updater'からautoUpdaterをインポート
 const { autoUpdater } = require('electron-updater');
 
+// electron-updaterのログ設定
+autoUpdater.logger = require('electron-log');
+autoUpdater.logger.transports.file.level = 'info';
+
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
   app.quit();
@@ -49,6 +53,7 @@ app.whenReady().then(() => {
   createWindow();
 
   // アプリ起動時に一度だけ、更新がないかチェック
+  console.log('更新チェックを開始します...');
   autoUpdater.checkForUpdatesAndNotify();
 
   // On OS X it's common to re-create a window in the app when the
@@ -62,7 +67,33 @@ app.whenReady().then(() => {
 
 // 手動更新チェック用のIPCハンドラ
 ipcMain.on('check-for-updates', () => {
+  console.log('手動更新チェックを開始します...');
   autoUpdater.checkForUpdatesAndNotify();
+});
+
+// electron-updaterのイベントハンドラー
+autoUpdater.on('checking-for-update', () => {
+  console.log('更新をチェック中...');
+});
+
+autoUpdater.on('update-available', (info) => {
+  console.log('更新が利用可能です:', info);
+});
+
+autoUpdater.on('update-not-available', (info) => {
+  console.log('更新は利用できません:', info);
+});
+
+autoUpdater.on('error', (err) => {
+  console.log('更新エラー:', err);
+});
+
+autoUpdater.on('download-progress', (progressObj) => {
+  console.log('ダウンロード進捗:', progressObj);
+});
+
+autoUpdater.on('update-downloaded', (info) => {
+  console.log('更新がダウンロードされました:', info);
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common
