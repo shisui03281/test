@@ -1,4 +1,4 @@
-name: 'Publish Electron App with Electron-Builder'
+name: 'Publish Windows App'
 
 on:
   push:
@@ -6,36 +6,24 @@ on:
       - 'v*.*.*'
 
 jobs:
-  publish-app:
-    strategy:
-      matrix:
-        os: [windows-latest, macos-latest, ubuntu-latest]
-
-    runs-on: ${{ matrix.os }}
+  publish-windows:
+    # 実行環境をWindowsに固定
+    runs-on: windows-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Node.jsのバージョンを20に更新
       - name: Setup Node.js v20
         uses: actions/setup-node@v4
         with:
-          node-version: '20' # 警告解消のためバージョンを20に指定
+          node-version: '20'
           cache: 'npm'
-
-      - name: Install build dependencies (Linux)
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y fakeroot dpkg rpm
 
       - name: Install dependencies
         run: npm ci
 
-      # "npm run build" を実行し、GH_TOKENを渡す
-      - name: Build and Publish application
+      - name: Build and Publish Windows application
         run: npm run build
         env:
-          # electron-builderには GH_TOKEN が必要
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
