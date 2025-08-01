@@ -1,7 +1,7 @@
 {
   "name": "my-app",
   "productName": "MyApp",
-  "version": "1.1.9",
+  "version": "1.1.10",
   "description": "My Electron application description",
   "main": "src/index.js",
   "scripts": {
@@ -70,7 +70,8 @@
     "publish": {
       "provider": "github",
       "owner": "shisui03281",
-      "repo": "test"
+      "repo": "test",
+      "releaseType": "release"
     }
   }
 }
